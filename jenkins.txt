@@ -1,3 +1,16 @@
+JENKINS:
+Jenkins is a Continuous Integration (CI) server or tool which is written in java. It provides Continuous Integration services for software development, which can be started via command line or web application server
+
+Continuous Integration
+
+Continuous Integration (CI) is a development practice that requires developers to integrate code into a shared repository several times a day. It is a process of running your tests on a non-developer (say testers) machine automatically when someone pushes new code into the source repository. 
+
+Jenkins Advantages
+
+In this type of procedure, there is a huge advantage of knowing whether all the jobs (configured project in Jenkins) work properly or not. And also we can get fast feedback. The fast feedback is very important so you will always know, right after you broke the build. In the console, you will get the detailed log messages. From this, you will get to know what the reason for job fail was and you can also get to know how you can revert it back. Using an Artifact Repository in CI server will successfully deploy the built snapshot and release which is available to other developers.
+
+
+
 ####################################
 INSTALLING AND CONFIGURING JENKINS
 ####################################
