@@ -1,3 +1,16 @@
+
+SUBVERSION:
+Subversion is a software versioning and revision control tool which is widely used for source code management. it is distributed as open source under apache license. It is a centralised version control tool which means that there is a single “central” copy of your project somewhere (probably on a server), and programmers will “commit” their changes to this central copy. A typical svn repo is divided into tag, trunk and branches where trunk is the main line of developement, branches are forked out of trunk for the purpose of development of new features etc and tags are the snapshots of code(either from branch or trunk) that has been released. 
+
+
+=======
+CONTENT
+=======
+*SVN INSTALLATION PROCESS
+*SVN troubleshooting
+*SVN COMMANDS
+*PRE-COMMIT HOOK SCRIPT
+
 ############################
 SVN INSTALLATION PROCESS
 ############################
@@ -81,4 +94,58 @@ This XML file does not appear to have any style information associated with it. 
 the problem is with the location path mentioned in svn's conf file
 Eg:
 <Location /svn> should be <Location /svn/path-to-repo>
+
+############################
+SVN COMMANDS
+############################
+1. svn co <repo URL> - co stands for checkout. it will download the repo/module form svn sever onto your local environment. In addition, it will also download .svn which has all the metadata.
+
+2. svn export <repo URL>- it will download the repo/module form svn sever onto your local environment.But, it will not have .svn folder.
+
+3. svn status- to check all the files that have changed in a directory or a new folder/file that has been created or deleted.
+
+different letters denote a specific attribute
+A added
+U updated
+M modified
+D deleted
+G merged
+? not under version control
+! svn doesn't know about this file/folder
+
+4. svn add- to add a file/folder and bring it under version control
+
+5. svn ci <files to commit> -m "log message" - ci stands for commit. the command is used to commit the changes to the repo. -m is used to added a meaningful message about the changes. giving log message is mandatory.
+
+6. svn cleanup- to cleanup a locked directory
+
+7. svn update- it will download the changes(if any) from the central repo and update the local environment.
+
+###################
+Pre-commit hook
+###################
+
+a pre-commit hook script can be created in svn to enforce rules such as making log message mandaory for committing, blocking certain files from being committed to repo etc.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
