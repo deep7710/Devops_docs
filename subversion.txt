@@ -1,0 +1,84 @@
+############################
+SVN INSTALLATION PROCESS
+############################
+**denotes comments
+
+1. yum install httpd subversion mod_dav_svn -y 
+
+** mod_dav_svn it's a module which allows Apache HTTP Server to serve SVN repositories. mod_dav_svn is an interface for mod_dav that provides a CVS like repository which is based on the new Delta-V specification. It is an extension to WebDAV and useful if you need versioning control.
+
+
+2. service httpd restart
+3. cd /var/www/
+4. mkdir svn(can be anything); svnadmin create repos(repo name can be anything)
+5. vim  /etc/httpd/conf.d/subversion.conf
+       example                  |
+add the following		|
+===========================================================
+LoadModule dav_svn_module     modules/mod_dav_svn.so
+LoadModule authz_svn_module   modules/mod_authz_svn.so
+LoadModule dontdothat_module  modules/mod_dontdothat.so
+
+<Location /svn/repos>
+DAV svn
+SVNPath /var/www/svn/repos
+AuthName "Authorization Realm"
+AuthType Basic
+AuthUserFile /var/www/svn/repos/conf/.htpasswd
+AuthzSVNAccessFile /var/www/svn/repos/conf/svnuser
+Require valid-user
+Order deny,allow
+Allow from all
+</Location>
+=============================================================
+
+6. cd /var/www/svn/repos/conf/
+7. touch .htpasswd(passwd/user file can be anything) svnuser(user access;name can be anything)
+8. htpasswd -m .htpasswd <name>
+9. vim svnuser;give r,w,rw access to user
+10. chown -R apache.apache /var/www/svn
+11. svn import /home/import file:///var/www/svn/repos-m "message" (this is done to create the structure within the repo i.e tag, trunk, branch. create a folder import and within that create three folder as tag,trunk and branch. use the command no 11 to import structure within SVN repo)
+
+
+**IDEALLY
+disable selinux
+
+###########################
+SVN troubleshooting
+###########################
+
+ERROR:
+
+*------------------------------------------------------------------------------------------
+Can't open file '/var/www/svn/repos/db/txn-current-lock': Permission denied [500, #13]
+------------------------------------------------------------------------------------------
+The SELINUX boolean value to make SVN write through webdav work is:
+
+setsebool -P httpd_unified=1
+
+ERROR:
+
+*------------------------------------------------------------------------------------------------------------------------------------
+svn: E175002: Server sent unexpected return value (500 Internal Server Error) in response to POST request for '/svn/repos/!svn/me'
+-------------------------------------------------------------------------------------------------------------------------------------
+The SELINUX boolean value to make SVN write through webdav work is:
+
+setsebool -P httpd_unified=1
+
+*Better to disable selinux
+
+ERROR:
+
+-----------------------------------------
+Forbidden access to svn repo in browser
+-----------------------------------------
+change SVNParentPath to SVNPath in conf file of subversion
+
+
+------------------------------------------------------------------------------------------------------------------
+This XML file does not appear to have any style information associated with it. The document tree is shown below
+------------------------------------------------------------------------------------------------------------------
+the problem is with the location path mentioned in svn's conf file
+Eg:
+<Location /svn> should be <Location /svn/path-to-repo>
+
