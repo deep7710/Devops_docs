@@ -1,0 +1,82 @@
+####################################
+INSTALLING AND CONFIGURING JENKINS
+####################################
+
+
+**install java-->DEPENDENCY(MUST)
+1. yum install java -y
+
+**add jennkins repo to yum
+2. wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+
+**add verification key for jenkins
+3. rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+**Install jenkins
+4. yum install jenkins -y
+
+**start jenkins
+5. service jenkins start
+
+**access jenkins in browser localhost:8080
+**8080 is default port
+
+cat /var/lib/jenkins/secrets/initialAdminPassword
+and add this passwd in console
+
+follow the remaining procedure as directed by GUI of jenkins
+
+
+**(set java_home)
+export JAVA_HOME="path that you found"
+export PATH=$JAVA_HOME/bin:$PATH
+
+
+____________________________
+service command not found
+____________________________
+export PATH=$PATH:/sbin
+
+
+========================
+JENKINS TROUBLESHOOT
+========================
+
+-------------------------------------------------------------------
+if 8080 is not working the add it to firewall using below command
+-------------------------------------------------------------------
+firewall-cmd --zone=public --permanent --add-port=8080/tcp
+firewall-cmd --reload
+
+----------------------------------------------------------------------
+to change default port 8080 in jenkins
+------------------------------------------------------------------------
+If you want to change the default port that Jenkins runs on, run:
+
+vim /etc/sysconfig/jenkins
+Find the following line and change the port number you want to use:
+
+JENKINS_PORT="8080"--change this port to the desired port no.
+
+
+------------------------------------------
+command to check if the port is accessible
+-------------------------------------------
+netstat -an|grep <port number>
+
+it will respond as LISTEN
+
+---------------------------------------------------
+to reset admin password
+----------------------------------------------
+vim /var/lib/jenkins/config.xml
+
+change-- <useSecurity>true</useSecurity>   @line8,1
+to-- <useSecurity>false</useSecurity>
+
+service jenkins restart
+ 
+and access jenkins in browser and make changes accordingly 
+
+
+
