@@ -127,6 +127,9 @@ Pre-commit hook
 
 a pre-commit hook script can be created in svn to enforce rules such as making log message mandaory for committing, blocking certain files from being committed to repo etc.
 
+refer https://github.com/deep7710/Shell_scripts/blob/master/pre-commit-svn for sample pre-commit hook script
+
+
 
 
 
