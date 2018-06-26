@@ -1,0 +1,39 @@
+====================================
+INSTALLING TOMCAT ON CENTOS
+=====================================
+
+**update system
+1. yum update -y
+
+**install tomcat
+2. yum install tomcat -y
+
+**install tomcat admin packages
+3. yum install tomcat-webapps tomcat-admin-webapps -y
+
+**add user in tomcat-user.conf in /usr/share/tomcat
+4. vim tomcat-user.conf >>  Eg: <user name="deep" password="deep" roles="admin,manager,admin-gui,admin-script,manager-gui,manager-script,manager-jmx,manager-status" />
+
+**change JAVA option that tomcat user uses when it starts
+Add the following JAVA_OPTS line to the file. Feel free to change the Xmx and MaxPermSize values—these settings affect how much memory Tomcat will use:
+5. vim tomcat.conf
+ >> JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Djava.awt.headless=true -Xmx512m -XX:MaxPermSize=256m -XX:+UseConcMarkSweepGC"
+ 
+6. change port no in server.xml if required (jenkins also has default port as 8080, so if in case you have jenkins installed on the same server as tomcat then kindly change the port no of either one of them.)
+
+7. service tomcat start/ systemctl start tomcat
+
+
+**to check if the tomcat is up and running and accessible in the browser, type the below command and then type tomcats port no in place of <port no.>
+8. netstat -an|grep <port no.>
+
+OUTPUT should be like this:
+
+[root@ip-172-31-19-197 ~]# netstat -an |grep 8080
+tcp        0      0 :::8080                     :::*                        LISTEN      
+
+
+9. systemctl enable tomcat   -->If you want Tomcat to run every time the server is booted up, you will need to enable the service
+
+10. access tomcat in browser http://localhost:port_no.
+
