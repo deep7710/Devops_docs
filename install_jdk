@@ -1,0 +1,29 @@
+JDK has both java and javac in bin whereas JRE has only java  and not javac in bin
+
+#############################
+to install jkd 8 on centos
+#############################
+
+sudo yum install java-1.8.0-openjdk-devel
+
+#############################
+to install jkd 8 JRE on centos **likewise for java 7 and 6
+#############################
+sudo yum install java-1.8.0-openjdk
+
+#############################
+to install jkd 7 on centos
+#############################
+sudo yum install java-1.7.0-openjdk-devel
+
+
+#############################
+to install jkd 6 on centos
+#############################
+sudo yum install java-1.6.0-openjdk-devel
+
+####################
+setting java home
+#####################
+export JAVA_HOME=path till java(/usr/lib/jvm/{java})
+export PATH=$JAVA_HOME/bin:$PATH
