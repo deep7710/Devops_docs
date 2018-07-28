@@ -91,5 +91,9 @@ service jenkins restart
  
 and access jenkins in browser and make changes accordingly 
 
-
-
+error while running jenkinsfile
+------------------------------------------------------------------------------------------------------------------------
+ERROR: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Post 
+------------------------------------------------------------------------------------------------------------------------
+sudo usermod -a -G root jenkins
+sudo service jenkins restart
