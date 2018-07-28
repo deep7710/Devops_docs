@@ -27,3 +27,17 @@ setting java home
 #####################
 export JAVA_HOME=path till java(/usr/lib/jvm/{java})
 export PATH=$JAVA_HOME/bin:$PATH
+
+
+------------------------------
+service command not found
+-------------------------------
+this happens when you do not mention $ in front of PATH while running 
+export PATH=$JAVA_HOME/bin:$PATH and instead run 
+export PATH=$JAVA_HOME/bin:PATH
+or accidently change PATH varialble
+in such a situation commands like service, systemctl ,ls,ll etc. will not work as the path variable is not pointinf to /bin or/sbin where all the executable files are kept
+----
+hence set PATH again using below command
+
+export PATH=$JAVA_HOME/bin:$PATH
