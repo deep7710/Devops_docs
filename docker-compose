@@ -1,0 +1,106 @@
+you should have Docker installed on your machine, then go ahead and install Docker Compose. First, install python-pip as prerequisite:
+-------------------------------
+sudo yum install epel-release
+sudo yum install -y python-pip
+--------------------------------
+
+Then you can install Docker Compose:
+------------------------------------
+sudo pip install docker-compose
+
+
+
+You will also need to upgrade your Python packages on CentOS 7 to get docker-compose to run successfully:
+----------------------------
+sudo yum upgrade python*
+-----------------------------
+
+----------------------------------------
+Running a Container with Docker Compose
+----------------------------------------
+The public Docker registry, Docker Hub, includes a simple Hello World image. Now that we have Docker Compose installed, let's test it with this really simple example.
+
+First, create a directory for our YAML file:
+mkdir hello-world
+
+Then change into the directory:
+cd hello-world
+
+Now create the YAML file using your favorite text editor (we will use nano):
+
+nano docker-compose.yml
+Put the following contents into the file, save the file, and exit the text editor:
+--------------------
+docker-compose.yml
+-------------------
+my-test:
+  image: hello-world
+The first line will be used as part of the container name. The second line specifies which image to use to create the container. The image will be downloaded from the official Docker Hub repository.
+
+While still in the ~/hello-world directory, execute the following command to create the container:
+
+-------------------
+docker-compose up
+-------------------
+The output should start with the following:
+
+Output of docker-compose up
+----------------------------
+Creating helloworld_my-test_1...
+Attaching to helloworld_my-test_1
+my-test_1 | 
+my-test_1 | Hello from Docker.
+my-test_1 | This message shows that your installation appears to be working correctly.
+my-test_1 | 
+The output then explains what Docker is doing:
+
+The Docker client contacted the Docker daemon.
+The Docker daemon pulled the "hello-world" image from the Docker Hub.
+The Docker daemon created a new container from that image which runs the executable that produces the output you are currently reading.
+The Docker daemon streamed that output to the Docker client, which sent it to your terminal.
+If the process doesn't exit on its own, press CTRL-C.
+
+This simple test does not show one of the main benefits of Docker Compose — being able to bring a group of Docker containers up and down all at the same time. The How To Install Wordpress and PhpMyAdmin with Docker Compose on Ubuntu 14.04 articles show how to use Docker Compose to run three containers as one application group. It is written for Ubuntu 14.04, but the steps can easily be adapted for CentOS 7.
+
+--------------------------------
+Learning Docker Compose Commands
+--------------------------------
+Let's go over the commands the docker-compose tool supports.
+
+The docker-compose command works on a per-directory basis. You can have multiple groups of Docker containers running on one machine — just make one directory for each container and one docker-compose.yml file for each container inside its directory.
+
+So far we've been running docker-compose up on our own and using CTRL-C to shut it down. This allows debug messages to be displayed in the terminal window. This isn't ideal though, when running in production you'll want to have docker-compose act more like a service. One simple way to do this is to just add the -d option when you up your session:
+
+docker-compose up -d
+docker-compose will now fork to the background.
+------------------------------------------------
+
+To show your group of Docker containers (both stopped and currently running), use the following command:
+
+docker-compose ps
+For example, the following shows that the helloworld_my-test_1 container is stopped:
+
+Output of `docker-compose ps`
+        Name           Command   State    Ports 
+-----------------------------------------------
+helloworld_my-test_1   /hello    Exit 0         
+A running container will show the Up state:
+
+Output of `docker-compose ps`
+     Name              Command          State        Ports      
+---------------------------------------------------------------
+nginx_nginx_1   nginx -g daemon off;   Up      443/tcp, 80/tcp 
+To stop all running Docker containers for an application group, issue the following command in the same directory as the docker-compose.yml file used to start the Docker group:
+
+docker-compose stop
+Note: docker-compose kill is also available if you need to shut things down more forcefully.
+
+In some cases, Docker containers will store their old information in an internal volume. If you want to start from scratch you can use the rm command to fully delete all the containers that make up your container group:
+
+docker-compose rm 
+If you try any of these commands from a directory other than the directory that contains a Docker container and .yml file, it will complain and not show you your containers:
+
+Output from wrong directory
+        Can't find a suitable configuration file in this directory or any parent. Are you in the right directory?
+
+        Supported filenames: docker-compose.yml, docker-compose.yaml, fig.yml, fig.yaml
