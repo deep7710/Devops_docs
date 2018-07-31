@@ -2,6 +2,8 @@ you should have Docker installed on your machine, then go ahead and install Dock
 -------------------------------
 sudo yum install epel-release
 sudo yum install -y python-pip
+
+pip install --upgrade pip(for upgrading pip)
 --------------------------------
 
 Then you can install Docker Compose:
