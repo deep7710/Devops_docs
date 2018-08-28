@@ -37,3 +37,28 @@ tcp        0      0 :::8080                     :::*                        LIST
 
 10. access tomcat in browser http://localhost:port_no.
 
+==============================================
+setting up tomcat for remote debuggging
+==============================================
+open catalina.sh
+-----------------
+export JPDA_ADDRESS=8000
+export JPDA_TRANSPORT=dt_socket
+bin/catalina.sh jpda start
+
+add this stuff to your startup script so that you are always running tomcat in debug mode
+---------------------------------------------------------------------------------------------
+export JPDA_ADDRESS=8000
+export JPDA_TRANSPORT=dt_socket
+
+Change the execute line at the end to include jpda start
+--------------------------------------------------------
+exec "$PRGDIR"/"$EXECUTABLE" jpda start "$@"
+
+Run the startup script when starting tomcat to run tomcat in debug mode
+-----------------------------------------------------------------------
+
+If you're concerned about opening up the known port for debugging, you can change the port on which JPDA listens by setting the JPDA_ADDRESS environment variable to something else (e.g. 38000).
+
+Once you have tomcat configured and started, you can connect to your running tomcat instance using a number of debugging tools. For example, Eclipse has a debugging view that can help you work with tomcat via remote control.
+
