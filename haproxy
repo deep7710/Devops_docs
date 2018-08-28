@@ -1,0 +1,89 @@
+setting up a platform which routes particular sets of HTTP traffic to several back-end application servers each running version 16.04 of Ubuntu’s open-source OS. To achieve this I decided to use HAProxy (it’s awesome!!) because it’s free, fast, open source and fairly simple to configure. So in the next section I’ll be sharing how I went about doing this. So lets get cracking !!.
+
+Firstly, you’ll have to get haproxy. To do this either grab it from here or using Ubuntu’s application package repository “apt” by running the commands below:
+--------------------------------------
+sudo apt-get update
+sudo apt-get install -y haproxy
+---------------------------------------
+So once that’s done downloading and installing, we will go straight ahead to configure haproxy. In this example what we are setting out to achieve is this:
+
+Assuming that we have 1 load-balancer and 4 application servers namely:
+
+“Load-1” which is the load-balancer (192.168.10.10)
+“APP-0”, “APP-1”, “APP-2” and “APP-3” which are our application servers. (192.168.0.1–4)
+Let’s assume that both APP-0 and APP-1 are running the same applications/APIs and APP-2 and APP-3 are running another set. We would like to be able to access these applications or APIs from one domain/IP.
+We would also like to have some form of redundancy where should a particular application server go down or come under heavy load, there should be another one to handle the traffic/serve requests.
+Ok, so let’s make a backup copy of haproxy’s config file:
+-----------------------------------------------------------------
+sudo cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.backup
+------------------------------------------------------------------
+Next we will edit the config file. You can edit it with any editor you’re comfortable with, but in this case I chose to go with vim (vim ftw!!…lol):
+------------------------------------
+sudo vim /etc/haproxy/haproxy.cfg
+-------------------------------------
+In it you will probably be met the default config but for now we will edit a few lines. Under the defaults section we will change the value for mode and the first option . The section should look like this now:
+
+---------------------------------------------------
+defaults
+ log global
+ mode http
+ option httplog
+ option dontlognull
+ option redispatch
+ timeout connect 5000
+ timeout client 50000
+ timeout server 50000
+ errorfile 400 /etc/haproxy/errors/400.http
+ errorfile 403 /etc/haproxy/errors/403.http
+ errorfile 408 /etc/haproxy/errors/408.http
+ errorfile 500 /etc/haproxy/errors/500.http
+ errorfile 502 /etc/haproxy/errors/502.http
+ errorfile 503 /etc/haproxy/errors/503.http
+ errorfile 504 /etc/haproxy/errors/504.http
+ ---------------------------------------------------
+Next up we will add the configuration for our load-balancer and application backends. Lets start with our load-balancer:
+
+-----------------------------------
+frontend lbalancer
+ bind *:80
+ bind *:8080
+ stats enable
+ stats uri /haproxy?stats
+ default_backend api-backend
+ acl a1 dst_port 8080
+ use_backend api-acl-apps if a1
+-------------------------------------
+Ok, now let’s step through.
+
+frontend lbalancer is where we define the name of our fronted (a.k.a the load-balancer ) in our set up.
+bind *:80 and bind *:8080 is where we bind the IP address(es) of our load-balancer to ports 80 and 8080. This means the load-balancer will be routing all requests hitting it on ports 80 and 8080 onward to our application servers.
+stats enable and stats uri /haproxy?stats will allow you to view stats of the load-balancer and the application servers it routes to. You can do this by going to http://192.168.10.10/haproxy?stats
+default_backend api-backend declares the default group of servers all our requests should be routed to (in our case we will call it api-backend). We will set up its configuration later on.
+acl a1 dst_port 8080 declares an access control list a1 for our load-balancer which routes all traffic on port 8080 to the application servers that fall under it.
+use_backend api-acl-apps if a1 declares a rule which uses our access control list for the application servers that are configured under api-acl-apps . This works in tandem with the earlier line.
+Next we will declare our backend server/application server configurations:
+
+----------------------------------------------
+backend api-backend
+        balance source
+        mode http
+        server app0 192.168.0.1:80 check
+        server app1 192.168.0.2:80 check
+backend api-acl-apps
+        balance source
+        mode http
+        server app2 192.168.0.3:6060 check
+        server app3 192.168.0.4:6060 check
+------------------------------------------------
+
+backend api-backend and backend api-acl-apps declares our application server configuration groups with their respective names.
+balance source declares our load-balancing algorithm. haproxy has a couple of them and you can check out here.
+mode declares the type of load-balancing we want to perform. Here we set it to http which will implement layer 7 load-balancing.
+server app0 192.168.0.1:80 check declares an application server and the port http traffic should be routed to. check enables the option that allows haproxy to perform health checks on the application server. This aids it to determine which server traffic should be routed to.
+Finally we save our changes and restart haproxy:
+
+-------------------------------
+sudo systemctl restart haproxy
+-------------------------------
+
+And that is about it. So now when you call http://192.168.10.10/some-api/endpoint it should route your request to either “APP-0” or “APP-1”. And calling http://192.168.10.10:8080/some-api/endpoint should forward requests to “APP-2” or “APP-3”. In another post I’ll show how you can set up a highly-available platform using haproxy.
