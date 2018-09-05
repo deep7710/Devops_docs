@@ -1,0 +1,165 @@
+ELK stands for
+----------------
+ES-elastic search--->for storing logs
+L-logstash-->for collecting logs and performing advanced prodessing
+K-Kibana-->for visualisation
+
+
+FILEBEAT-->(log shipper)for collecting logs from nodes and pushing them to either ES or L(for advanced processing)
+grok is used for filtering out relevant data from unstructured data
+
+for exxample:
+---------------
+SALT logs:
+2018-09-03 12:57:24,212 [salt.utils.parsers                                    :1045][ERROR ][46380] Minion received a SIGTERM. Exiting.
+
+grok:
+---------
+%{DATE:date}\s%{TIME:time}.*\]\[%{LOGLEVEL:log_level}.*\]\[%{NUMBER:thread_id}\]%{GREEDYDATA:log_message}
+
+result:
+--------
+2018-09-03 12:57:24,212 [salt.utils.parsers :1045][ERROR ][46380] Minion received a SIGTERM. Exiting.
+MATCHED
+thread_id	46380
+log_message	·Minion·received·a·SIGTERM.·Exiting.
+log_level	ERROR
+date	18-09-03
+time	12:57:24,212
+before match:	20
+
+the flow is
+--------------
+
+FILEBEAT(collecting)-->LS(processing)[grok  to filter]-->ES(storing)-->KIBANA(visualisation)
+=============================================================================================================================
+
+install java before  starting
+ 
+ 
+------------------
+ES installation:
+-----------------
+download latest rpm from official site
+install
+config /etc/elasticsearch/elasticsearch.yml
+set host, port,log path
+
+systemctl daemon-relaod
+systemctl start elasticsearch
+systemctl enable elasticsearch
+=============================================================================================================================
+-----------------------
+LOGSTASH installation:
+-----------------------
+download latest rpm from official site
+install
+config /etc/logstash/logstash.yml
+define path.data,path.config(path for LS config files..usually confi.d),path.log(path for LS logs)
+create folder patterns and files inside config.d like::
+-----------------------
+01-filebeat.conf(input)
+------------------------
+input {
+beats {
+port => 5044                                                   ##port to listen on ..filebeat will hit on this port
+ssl => false
+#ssl_certificate => "/etc/pki/tls/certs/logstash-forwarder.crt" ##ssl-certs
+#ssl_key => "/etc/pki/tls/private/logstash-forwarder.key"       ##ssl-keys
+}
+}
+
+-------------------------
+02-elastic.conf(output)
+--------------------------
+output {
+elasticsearch {                    ##out source name
+hosts => ["10.142.52.129:9200"]    ##ip along with port to send the processed logs to 
+#sniffing => true
+#manage_template => false
+#index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+#document_type => "%{[@metadata][type]}"
+}
+}
+
+---------------------------------------------
+03-salt.conf(filter)..give any sensible name
+--------------------------------------------- 
+filter {
+if [type] == "salt-logs" {                          ##doc_type that was defined in filebeat
+  grok {
+      break_on_match => true                        
+      patterns_dir => "/etc/logstash/patterns"      ## the to search for pattern
+            match => { "message" => "%{SALT}" }     ##here SALT is defined in pattern file so it will look for that.
+  }
+  }
+}
+
+inside pattern folder create a file and give sensible name
+example:
+SALT
+and inside it 
+--------
+SALT %{DATE:date}\s%{TIME:time}.*\]\[%{LOGLEVEL:log_level}.*\]\[%{NUMBER:thread_id}\]%{GREEDYDATA:log_message}
+
+systemctl daemon-relaod
+systemctl start logstash
+systemctl enable logstash
+
+=============================================================================================================================
+
+
+---------------------
+KIBANA installation:
+---------------------
+download latest rpm from official site
+install
+config /etc/kibana/kibana.yml
+server port ,ip and ES URL to pick data from
+
+--------------------optional----------------------------------------------
+port forwarding can be set to forward all hits on 80 to 5601
+firewalld-cmd --permanent -add-forward-port=port=80:proto=tcp:toport=5601
+firewall-cmd --reload
+-------------------optional-----------------------------------------------
+
+
+systemctl daemon-relaod
+systemctl start kibana
+systemctl enable kibana
+
+
+
+=============================================================================================================================
+
+---------------------------------------------------------------------------
+FILEBEAT installation(presently there are issues with 6.x so download 5.x)
+---------------------------------------------------------------------------
+download latest rpm from official site
+install
+config /etc/filebeat/filebeat.yml
+define host,port,output(ES/LS) etc
+example:
+-----------------------------------------
+filebeat:
+  prospectors:                              ##locating specific files and applying basic processing to them
+
+   -
+      paths:
+        - /root/salt/minion                 ##path of logs to configure
+      input_type: log                       ## input type(log,syslog etc)
+      fields:
+      document_type: salt-logs              ##give any sensible name so that it can be used in logstash's input file
+
+  registry_file: /var/lib/filebeat/registry ##The registry file stores the state and location information that Filebeat uses to track where it was last reading
+output:
+  logstash:                                 ## define where to push the logs either logstash/ES
+    hosts: [ "10.142.52.129:5044" ]         ## define hosts along with port
+shipper: 
+logging:                                    ##https://www.elastic.co/guide/en/beats/filebeat/current/configuration-logging.html
+  files:
+    path: /alog/mybeat
+    name: mybeat.log
+    rotateeverybytes: 524288000 # = 50MB    ##will create new mybeat.log after the file has reached 50mb and back up the current file as mybeat.log.1/2/3..
+---------------------------------------------
+=============================================================================================================================
