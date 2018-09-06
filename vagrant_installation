@@ -1,0 +1,63 @@
+this documentation is for installing vagrant o ubuntu
+
+
+------------
+VAGRANT
+------------
+Vagrant is an open source command line tool for building and managing virtual machine environments. 
+By default Vagrant can provision machines on top of VirtualBox, Hyper-V and Docker but many other providers such as 
+Libvirt (KVM), VMware and AWS can be installed via the Vagrant plugin system.
+
+
+STEPS
+------
+install virtualbox(we will provision our machines on top of VirtualBox)
+-------------------
+sudo apt install virtualbox
+
+install vagrant
+------------------
+sudo apt install vagrant
+
+verify installtion
+-------------------
+vagrant --version
+
+
+now get started
+-------------------
+mkdir ~/my-first-vagrant-project
+cd ~/my-first-vagrant-project
+
+vagrant init centos/7-->to initialize a new Vagrantfile using the vagrant init command and specify the box we wish to use.Boxes are the package format for the Vagrant environments and are provider-specific.
+
+vagrant up
+
+-------------------
+ERROR
+-------------------
+if you get error like:
+==>VT-x not enabled...
+
+then:
+
+restart system 
+del+f12
+enter bios
+and go to virtualisation and enable it press f10 to save
+start system
+do:
+vagrant up
+
+--------------------
+configuration part
+----------------------
+for enabling vm's ip access in browser
+
+open Vgrantfile
+and uncomment
+-------------------
+config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+config.vm.network "private_network", ip: "192.168.33.10"
+-------------------
+
