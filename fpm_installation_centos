@@ -1,23 +1,34 @@
+------------------------------
 fpm-Effing package management
-----
+------------------------------
 fpm is a command-line program designed to help you build packages.
 
+-------------
 dependencies
 ------------
 ruby
 fpm is written in ruby.hence the requirement for ruby
 
+-----------------------------
 installating dependencies 
 -----------------------------
-yum install ruby-devel gcc make rpm-build rubygems
+yum install ruby-devel gcc make rpm-build rubygems -y
 
+--------------
 installing fpm
 --------------
-gem install --no-ri --no-rdoc fpm
+gem install --no-ri --no-rdoc fpm 
 
---no-ri and --no-rdoc are to avoid docs,readme
+NOTE: --no-ri and --no-rdoc are to avoid docs,readme
 
+--------------------
 check installation:
 --------------------
 fpm --version
+
+-----------
+executable:
+-----------
+# whereis fpm
+fpm: /usr/local/bin/fpm
 
