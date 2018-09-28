@@ -32,3 +32,26 @@ executable:
 # whereis fpm
 fpm: /usr/local/bin/fpm
 
+--------------------
+fpm command example
+--------------------
+/usr/local/bin/fpm -s dir -t rpm -a all \       ## -s denotes source type where your package is coming from 
+    -n kafka \
+    -v $KAFKA_VERSION \                         ## $KAFKA_VERSION is the extracted kafka tarball name
+    --iteration "1.miguno" \
+    --maintainer "$MAINTAINER" \                ## $MAINTAINER is the name of person maintaining the rpm 
+    --vendor "Kafka Project" \
+    --url http://kafka.apache.org \            ## base url of kafka tarball
+    --description "A high-throughput distributed messaging system (RPM built from release for Scala $SCALA_VERSION)" \
+    -p $OLD_PWD/kafka-VERSION.el6.ARCH.rpm \
+    -a "x86_64" \
+    --prefix $INSTALL_ROOT_DIR \               ## $INSTALL_ROOT_DIR defines the installation path
+
+
+## -s, denotes "source type" where your package is coming from like a directory (dir), a rubygem (gem), an rpm (rpm), a python 
+    package (python), a php pear module (pear) etc.
+## -t, denotes "Target type" i.e. what your output package form should be. eg rpm, deb etc.
+## -a, The architecture name. Usually matches 'uname -m'. For automatic values, you can use '-a all' or '-a native'
+    example:-uname -m-->x86_64
+## -n, --name NAME  The name to give to the package    
+## -p, --package OUTPUT          The package file path to output.
