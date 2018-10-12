@@ -1,1 +1,38 @@
 
+Problem it solves:
+------------------
+1. secure production. nobody needs to access production in order to check app logs
+2. saves disk space
+3. centralise logging
+
+Tools:
+------
+Filebeat-log shipper/kafka producer
+kafka-high speed stream processor
+Logstash-data processing/kafka consumer
+elasticsearch-stores data
+kibana-visualisation
+SALT-for pushing configurations on all the nodes
+kafka manager-UI tool for kafka cluster
+
+filebeat:
+---------
+FB will play the role of kafka producer. 
+add prospector in FB
+add file  path- path till log file
+document_type- this will be used by ES for creating index
+add fields- like kafka_topic: xyz...this will be used to push logs to the kafka topic
+
+under output
+mention kafka
+then hosts--> ip:ports for kafka nodes
+              for multiple nodes..do ip:port,ip:port
+topics: '%{[kafka_topic]}'
+
+refer the configuration repo for the detailed configuration.
+
+this configuration will use the num.partition and other deatils defined in server.prop in kafka to create a topic if not created
+eg
+is partition defnd is 10 and replicatn factor defnd is 3
+then FB will create a topic with 10 partition and with a replication factor of 3
+you can also create a topic on your own and define these details. in this case, FB will not modify already created topic 
