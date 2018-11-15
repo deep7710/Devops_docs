@@ -33,6 +33,15 @@ vagrant init centos/7-->to initialize a new Vagrantfile using the vagrant init c
 
 vagrant up
 
+*if required------------------------
+custom configuration
+------------------------
+  config.vm.define "centos1" do |centos1|
+  centos1.vm.box = "centos/7"
+  centos1.vm.hostname="zabbix-server"
+  centos1.vm.network "private_network", ip: "10.0.0.2"
+  end
+  
 -------------------
 ERROR
 -------------------
