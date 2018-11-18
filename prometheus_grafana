@@ -1,0 +1,13 @@
+-----------------------------------
+Prometheus installation on centos7
+-----------------------------------
+wget https://github.com/prometheus/prometheus/releases/download/v2.5.0/prometheus-2.5.0.linux-amd64.tar.gz
+tar -xvf prometheus-2.5.0.linux-amd64.tar.gz
+mv prometheus-2.5.0.linux-amd64 prometheus
+mv prometheus /opt/
+vim /etc/systemd/system/prometheus.service-->refer configuration repo for the service conf file
+service prometheus start
+promethues runs on port 9090(default)
+
+*sample prometheus.yml is the conf file present in configuration repo
+ 
