@@ -11,3 +11,41 @@ promethues runs on port 9090(default)
 
 *sample prometheus.yml is the conf file present in configuration repo
  
+ -------------------------------------------------
+ installing alertmanager for prometheus
+ -------------------------------------------------
+wget https://github.com/prometheus/alertmanager/releases/download/v0.15.3/alertmanager-0.15.3.linux-amd64.tar.gz
+tar -xvf alertmanager-0.15.3.linux-amd64.tar.gz 
+mv alertmanager-0.15.3.linux-amd64 alertmanager
+mv alertmanager /opt/
+nohup ./alertmanager & or create a service file
+
+----------------------------------------------
+installing node_exporter
+----------------------------------------------
+wget https://github.com/prometheus/node_exporter/releases/download/v0.16.0/node_exporter-0.16.0.linux-amd64.tar.gz
+tar -xvf node_exporter-0.16.0.linux-amd64.tar.gz
+mv node_exporter-0.16.0.linux-amd64 node_exporter
+mv node_exporter /opt/
+vim /etc/systemd/system/node_exporter.service-->refer configuration repo for the service conf file
+service node_exporter start
+
+-------------------------------
+installing grafana
+-------------------------------
+vim /etc/yum.repos.d/grafana.repo
+*************************
+[grafana]
+name=grafana
+baseurl=https://packagecloud.io/grafana/stable/el/7/$basearch
+repo_gpgcheck=1
+enabled=1
+gpgcheck=1
+gpgkey=https://packagecloud.io/gpg.key https://grafanarel.s3.amazonaws.com/RPM-GPG-KEY-grafana
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+**************************
+yum install grafana
+
+
+
