@@ -9,6 +9,7 @@ vim /etc/systemd/system/prometheus.service-->refer configuration repo for the se
 service prometheus start
 promethues runs on port 9090(default)
 
+*ntp -gq-->to sync time
 *sample prometheus.yml is the conf file present in configuration repo
  
  %%%%%%%%%%%%%%%%%%%
