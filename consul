@@ -1,0 +1,32 @@
+wget https://releases.hashicorp.com/consul/0.6.4/consul_0.6.4_linux_amd64.zip
+unzip consul_0.6.4_linux_amd64.zip
+mv consul /usr/local/bin/
+
+starting consul
+-----------------
+in server and bootstrap mode
+server-->the consul will start up as a server instance instead of a client
+bootstrap-->bootstrap option is used for the first server. This allows it to designate itself as the "leader" for the cluster 
+            without an election (since it will be the only server available). if you dont mention bootstrap,then the node will 
+            not be the leader
+
+**/usr/local/bin/consul agent -server -bootstrap -advertise=10.0.0.11 -data-dir /tmp/consul
+
+-advertised=10.0.0.11-->to specify the private ip. otherwise  you might have error like:
+----------------------------------------------------------------------------------
+Failed to get advertise address: Multiple private IPs found. Please configure one.
+----------------------------------------------------------------------------------
+
+--means no leader elected yet
+----------------------------------------------------------------------------------
+[ERR] agent: failed to sync remote state: No cluster leader
+----------------------------------------------------------------------------------
+
+**/usr/local/bin/consul join 10.0.0.12 10.0.0.13-->to join nodes to the consul cluster.
+
+**/usr/local/bin/consul members
+output:
+Node      Address         Status  Type    Build  Protocol  DC
+consul-1  10.0.0.11:8301  alive   server  0.6.4  2         dc1
+consul-2  10.0.0.12:8301  alive   server  0.6.4  2         dc1
+consul-3  10.0.0.13:8301  alive   server  0.6.4  2         dc1
