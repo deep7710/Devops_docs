@@ -10,7 +10,7 @@ bootstrap-->bootstrap option is used for the first server. This allows it to des
             without an election (since it will be the only server available). if you dont mention bootstrap,then the node will 
             not be the leader
 
-**el
+**/usr/local/bin/consul agent -server -bootstrap -data-dir=/tmp/consul -advertise=10.0.0.2
 
 -advertised=10.0.0.11-->to specify the private ip. otherwise  you might have error like:
 ----------------------------------------------------------------------------------
