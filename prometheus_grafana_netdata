@@ -79,6 +79,7 @@ git clone https://github.com/firehol/netdata.git --depth=1
 cd netdata
 sudo ./netdata-installer.sh
 
+## metrics_path: '/api/v1/allmetrics?format=prometheus' ##
    - the daemon     at /usr/sbin/netdata
    - config files   in /etc/netdata
    - web files      in /usr/share/netdata
