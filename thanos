@@ -1,3 +1,14 @@
+CONTENT
+########
+# thanos
+# requirement
+# setup go env
+# setup thanos
+# thanos sidecar
+# thanos query
+# thanos query to grafana
+
+
 thanos
 ---------
 Thanos provides a global query view, data backup, and historical data access as its core features in a single binary. All three
@@ -85,3 +96,10 @@ repeated list of peer addresses or a DNS name, which it will resolve for peer IP
 thanos query --http-address  10.0.0.2:19192  --query.replica-label replica --cluster.peers   10.0.0.3:19391 --cluster.peers  10.0.0.4:19391 --cluster.peers 10.0.0.12:19391
 ------------------------------------------------------------------
 **--query.replica-label replica --> is used for de-duplicating series on the basis of prometheus servers 
+
+------------
+GRAFANA
+-------------
+use the prometheus plugin to add thanos query node as the data source. just pass thanos query url "ip:port" under url section while
+adding datasource.
+
