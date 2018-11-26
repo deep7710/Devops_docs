@@ -1,0 +1,87 @@
+thanos
+---------
+Thanos provides a global query view, data backup, and historical data access as its core features in a single binary. All three
+features can be run independently of each other. This allows you to have a subset of Thanos features ready for immediate benefit
+or testing, while also making it flexible for gradual roll outs in more complex environments.
+
+requirement
+-----------
+One or more Prometheus v2.2.1+ installations
+golang 1.10+
+An object storage bucket (optional)
+
+setup go
+--------
+wget https://dl.google.com/go/go1.10.3.linux-amd64.tar.gz
+tar -xvf go1.10.3.linux-amd64.tar.gz
+mv go /usr/local
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
+**set GOROOT path
+**set GOPATH for your project. not required in our case
+**export PATH
+
+setup thanos
+-------------
+wget https://github.com/improbable-eng/thanos/releases/download/v0.1.0/thanos-0.1.0.linux-amd64.tar.gz
+tar -xvf thanos-0.1.0.linux-amd64.tar.gz
+mv thanos-0.1.0.linux-amd64/thanos /usr/bin
+
+**download the thanos pre-compiled binary
+**move thanos executable to /usr/bin
+
+Sidecar
+-------
+
+The sidecar component of Thanos gets deployed along with a Prometheus instance. It implements Thanos' Store API on top of 
+Prometheus' remote-read API and advertises itself as a data source to the cluster. Thereby queriers in the cluster can treat 
+Prometheus servers as yet another source of time series data without directly talking to its APIs. Additionally, the sidecar 
+uploads TSDB blocks to an object storage bucket as Prometheus produces them. This allows Prometheus servers to be run with 
+relatively low retention while their historic data is made durable and queryable via object storage.
+
+MUST CONFIGURE EXTERNAL LABLE ON PROMETHEUS SERVER like:
+-------
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+  external_labels:
+    region: mumbai
+    monitor: Paytm-infrastructure-1
+    replica: B
+---------
+replica must be unique for evry PS 
+
+-------------------------------------
+thanos sidecar running on PS 10.0.0.3
+-------------------------------------
+thanos sidecar --prometheus.url http://10.0.0.3:9090 --tsdb.path /data --grpc-address 10.0.0.3:19091  --cluster.address 10.0.0.3:19391 --cluster.peers 10.0.0.12:19391 --http-address 10.0.0.3:19191
+
+---------------------------------------
+thanos sidecar running on PS 10.0.0.4
+---------------------------------------
+thanos sidecar --prometheus.url http://10.0.0.4:9090 --tsdb.path /data --grpc-address 10.0.0.4:19091 --cluster.address 10.0.0.4:19391  --http-address 10.0.0.4:19191
+
+#########
+ERROR: trigger reload: received non-200 response: 403 Forbidden"
+#########
+relaoder component is used for automatically reloading prometheus config when it changes. By-default, --web.enable-lifecycle is
+disable in prometheus for security reasons. to enable, strt prom with --web.enable-lifecycle flag and this error will go.
+you can leave it as it is and ignore this error as it does not make a difference to your setup. you can restart prometheus 
+maunally when you change config.
+
+run  thanos sidecar on each prom node and define external lables for prom nodes plus the replica lable must be unique
+
+thanos query
+-------------
+The query component implements the Prometheus HTTP v1 API to query data in a Thanos cluster via PromQL. It joins a Thanos
+cluster mesh and can access all data exposed by store APIs within it. It is fully stateless and horizontally scalable.
+The querier needs to be passed an initial list of peers to through which it can join the Thanos cluster. This can either be a
+repeated list of peer addresses or a DNS name, which it will resolve for peer IP addresses.
+
+------------------------------------------------------------------
+thanos query --http-address  10.0.0.2:19192  --query.replica-label replica --cluster.peers   10.0.0.3:19391 --cluster.peers  10.0.0.4:19391 --cluster.peers 10.0.0.12:19391
+------------------------------------------------------------------
+**--query.replica-label replica --> is used for de-duplicating series on the basis of prometheus servers 
