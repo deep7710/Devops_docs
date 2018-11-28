@@ -70,6 +70,10 @@ sslcacert=/etc/pki/tls/certs/ca-bundle.crt
 **************************
 yum install grafana
 
+####FINDINGS###
+when working with netdata dashboard,
+use instance=$instance in query to select the instance from drop down and change the metrics accordingly.
+HINT: change the json file of the netdata dashboard accordingly using awk/sed
 -------------------------------
 installing netdata
 ------------------------------
