@@ -3,8 +3,12 @@ lvdisplay
 lvdisplay /dev/vg_root/data
 mkfs.ext4 /dev/vg_root/data
 blkid /dev/vg_root/data
+
 vim /etc/fstab
+--------------
 UUID=6f242ed6-cfb5-4810-9f81-e44af0c91630 /data                   ext4    defaults        0 0
+---------------
+
 mount -a
 df -h
 mount | grep /data
