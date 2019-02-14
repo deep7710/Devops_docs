@@ -1,0 +1,59 @@
+Install Wazuh agent and wazuh manager
+-------------------
+# cat > /etc/yum.repos.d/wazuh.repo <<\EOF
+[wazuh_repo]
+gpgcheck=1
+gpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH
+enabled=1
+name=Wazuh repository
+baseurl=https://packages.wazuh.com/3.x/yum/
+protect=1
+EOF
+
+yum install wazuh-manager --> on master node
+yum install wazuh-agent --> on all hosts to be monitored
+
+Install Wazuh API
+-----------------
+NodeJS >= 4.6.1 is required in order to run the Wazuh API. If you do not have NodeJS installed or your version is older than 4.6.1, 
+then you can add the official NodeJS repository like this:
+curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
+yum install nodejs
+
+Python >= 2.7 is required in order to run the Wazuh API. It is installed by default or included in the official repositories 
+in most Linux distributions.
+# python --version
+if not installed
+then
+yum install -y python27
+else if if present but point to lower version 
+then
+point it  to higher version
+
+yum install wazuh-api
+
+
+ELK
+---
+Follow ELK guide in this repo to setup ELK
+Preferably use 6.x version of elastic stack
+refer configuration repo for filebeat.yml and wazuh-logstash.conf
+
+Delete an wazuh agent on WM
+---------------------------
+curl -u 'test:123!@#' -X DELETE "http://localhost:55000/agents/003"
+
+registering a WA
+-----------------
+curl -u 'test:123!@#' -k -X POST -d "name=test-machine&ip=x.x.x.x" http://y.y.y.y:55000/agents
+
+run below command on wazuh agent
+printf 'y' | /var/ossec/bin/manage_agents -i YOUR_KEY_GENERATED_BY_ABOVE_COMMAND
+
+then
+vim /var/ossec/etc/ossec.conf
+replace MASTER_IP with WM ip
+check protocol UDP/TCP
+
+service wazuh-agent start/restart
+service wazuh-agent status
